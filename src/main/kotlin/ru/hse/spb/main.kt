@@ -16,7 +16,7 @@ import java.util.*
  * wX - x component of the second wind's speed
  * wY - y component of the second wind's speed
  */
-data class Input(val x: Double, val y: Double, val vMax: Double,
+class Input(val x: Double, val y: Double, val vMax: Double,
                  val timeOfTheFirstWind: Double, val uX: Double,
                  val uY: Double, val wX: Double, val wY: Double)
 
