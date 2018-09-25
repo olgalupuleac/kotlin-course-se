@@ -25,7 +25,7 @@ data class Input(val x: Double, val y: Double, val vMax: Double,
  * sets a start point to (0, 0) and returns an instance of Input
  * to be passed to Solver.
  */
-fun readInput(): Input {
+private fun readInput(): Input {
     val scanner = Scanner(System.`in`)
     val startPointX = scanner.nextInt()
     val startPointY = scanner.nextInt()
@@ -61,8 +61,8 @@ class Solver(private val input: Input) {
      */
     companion object {
         const val LEFT_INITIAL = 0.0
-        const val RIGHT_INITIAL = 1e9;
-        const val NUM_OF_ITERATIONS = 100;
+        const val RIGHT_INITIAL = 1e9
+        const val NUM_OF_ITERATIONS = 100
     }
 
     /**
@@ -88,7 +88,7 @@ class Solver(private val input: Input) {
             val y = input.y - time * input.uY
             return isReachable(x, y, time)
         }
-        val timeOfTheSecondWind = time - input.timeOfTheFirstWind;
+        val timeOfTheSecondWind = time - input.timeOfTheFirstWind
         val x = input.x - input.timeOfTheFirstWind * input.uX -
                 timeOfTheSecondWind * input.wX
         val y = input.y - input.timeOfTheFirstWind * input.uY -
@@ -101,17 +101,17 @@ class Solver(private val input: Input) {
      * of the time in which the endpoint can be reached.
      */
     fun binarySearch(): Double {
-        var left = LEFT_INITIAL;
-        var right = RIGHT_INITIAL;
+        var left = LEFT_INITIAL
+        var right = RIGHT_INITIAL
         for (i in 1..NUM_OF_ITERATIONS) {
-            val median = (left + right) / 2;
+            val median = (left + right) / 2
             if (isValidTime(median)) {
-                right = median;
+                right = median
             } else {
-                left = median;
+                left = median
             }
         }
-        return right;
+        return right
     }
 }
 
