@@ -71,16 +71,20 @@ class TextElement(private val text: String) : Element {
 }
 
 @TeXMarker
-abstract class ElementWithText() : Element {
+abstract class ElementWithText : Element {
     val children = arrayListOf<Element>()
     operator fun String.unaryPlus() {
-        children.add(TextElement(this))
+        children += TextElement(this)
     }
 
     override fun render(buffer: DslBuffer, indent: String) {
         for (c in children) {
-            c.render(buffer, indent + "  ")
+            c.render(buffer, indent + SPACE)
         }
+    }
+
+    companion object {
+        const val SPACE = "  "
     }
 }
 
@@ -130,10 +134,10 @@ abstract class Block(private val name: String, private val isInner: Boolean = tr
     ) = initElement(CustomTag(name, pairOfOptionsToString(*options)), init)
 
     fun frame(frameTitle: String? = null, vararg options: String, init: Frame.() -> Unit
-    ) = initElement(Frame(frameTitle,  *options), init)
+    ) = initElement(Frame(frameTitle, *options), init)
 
     fun frame(frameTitle: String? = null, vararg options: Pair<String, String>, init: Frame.() -> Unit
-    ) = initElement(Frame(frameTitle,  pairOfOptionsToString(*options)), init)
+    ) = initElement(Frame(frameTitle, pairOfOptionsToString(*options)), init)
 }
 
 abstract class List(name: String, vararg options: String) : Block(name, true, *options) {
@@ -171,18 +175,18 @@ class RightAlignment : Block("flushright")
 class CenterAlignment : Block("center")
 
 class Document : Block("document", false) {
-    private var documentClass: DocumentClass? = null
+    private lateinit var documentClassVar: DocumentClass
     private var packages: MutableList<Package> = mutableListOf<Package>()
     fun documentClass(name: String, vararg options: String) {
-        if (documentClass != null) {
+        if (this::documentClassVar.isInitialized) {
             throw TeXDslException("Document class is specified more than once")
         }
-        documentClass = DocumentClass(name, *options)
+        documentClassVar = DocumentClass(name, *options)
     }
 
     override fun render(buffer: DslBuffer, indent: String) {
-        documentClass ?: throw TeXDslException("Document class is not specified")
-        documentClass!!.render(buffer, indent)
+        if (!this::documentClassVar.isInitialized) throw TeXDslException("Document class is not specified")
+        documentClassVar.render(buffer, indent)
         for (pack in packages) {
             pack.render(buffer, indent)
         }
@@ -208,7 +212,5 @@ class Document : Block("document", false) {
 }
 
 fun document(init: Document.() -> Unit): Document {
-    val document = Document()
-    document.init()
-    return document
+    return Document().apply(init)
 }
